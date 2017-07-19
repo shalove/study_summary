@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    //    Object 是所有类的父类，Object类中提供了一些方法，（因为是作为类中方法，所以是静态方法）
+    //    注意因为是Object类的方法，所以这些方法的调用都是以Object开头的，而不是实例对象
+    //    先创建一个 对象 obj 供以下例子使用
+    var obj = {
+        name: 'sha',
+        sex: '男',
+    };
+
+    1、Object.create(obj.prototype)
+    是用于创建一个基于obj原型对象的对象
+    ，
+    并可以添加属性及属性描述
+    //自己理解： 这里实际就是创建了一个obj原型对象，并且还可以进行扩展，添加属性和属性描述（添加属性和描述不是必要的，可以不添加）
+    //         属性描述有
+    //  value：属性值 ，
+    // writable：是否可写（属性值能否修改），
+    // enumerable：可否枚举（允不允许在遍历对象时让其显示） ，
+    // configurable：能否配置（初始设为false的话，就不能再设为true而且一旦设为false，这个属性
+    //                也就不能用  delete obj.属性名 来删除了，就是不可删除状态）
+
+   var ins =  Object.create(obj.prototype, {
+        name:{
+            value:'sha',        //原属性
+        },
+        sex:{
+            value: '男',         //原属性
+        },
+        face: {             //属性添加和属性描述
+            value: '瓜子',
+            writable: false,
+            enumerable: false,
+            configurable: false
+        },
+        accessor:{      //访问器设置（accessor只是属性名可以改）
+            set:function (p){   //这里的set就相当于PHP中的魔术方法 __set，当调用accessor属性传一个值时，她会
+//                                自动调用set方法，将值存起来
+                val = p;        //这里 val 不需要用加  this，因为他是隐式传递
+            },
+            get:function(){     //get 相当于PHP __get；用于获取保存的val值
+                return val;
+            }
+        }
+
+    });
+
+//    这里使用 Object.create（）方法创建基于原函数原型对象的一个对象，但是却又能添加新属性，有点类似于 PHP中的继承
+//    因为这样不仅有了原函数的方法，还可以在原函数的基础上再新添属性啥的，方法添加，可以在使用Object.create（obj.prototype）
+//   后，再自行定义其他方法
+
+
+
+    2、属性描述符
+    Object.defineProperty() 单个属性定义描述   Object.defineProperties()多个属性定义描述
+
+     var obj = {
+        name: 'sha',
+        sex: '男',
+    };
+
+    Object.defineProperty(obj,'height',{
+        value:172,
+        writable:true,
+        enumerable:true,
+        configurable:false,
+    });
+
+    Object.defineProperties(obj,{
+        height:{
+            value:172,
+            writable:true,
+            enumerable:true,
+            configurable:false,
+        },
+        hair:{
+            value:'短发',
+            writable:true,
+            enumerable:true,
+            configurable:false,
+        }
+    })
+
+
+
+    3 对象不变性
+
+    对于禁止扩展/对象密封/对象冻结   可以这样记： 对应增删改， 不可扩展就是不能再增加了，密封就是在不可扩展基础上
+                            也不能删除了，冻结就是在密封基础上不能再修改了。  对应 增 、 删 、 改
+
+
+    （1）模拟常量
+    常量特点：  不可修改、不可删除   所以定义一个属性，属性描述 writable和configurable 设为 false即可
+    var obj = {};
+    Object.defineProperty(obj,'PI',{
+        value:3.14,
+        writable:false,
+        configurable:false,
+    });
+
+
+    （2） 禁止扩展   Object.preventExtensions(obj)
+    var obj = {
+        name : 'sha',
+    };
+    Object.preventExtensions(obj);
+    此时就不能再给obj 添加属性了
+    obj.sex = '男';   //添不进去了
+
+
+
+    （3）对象密封   Object.seal(obj)    不可扩展，不可配置
+    var obj = {
+        name : 'sha',
+    };
+    Object.seal(obj);
+    Object.isSealed(obj);  //用于检查对象是否密封，返回值bool
+
+
+
+    （4）对象冻结  Object.freeze(obj)   不可扩展，不可配置、不可修改
+    var obj = {
+        name : 'sha',
+    };
+    Object.freeze(obj);
+    Object.isFrozen(obj); //检查对象是否冻结
+
+
+
+    （5）对象复制    对象是引用传递，一般的赋值不会新建对象，要想新建对象，可以用复制 Object.assign（dst，src）
+    在dom里节点对象复制可以采用  node.cloneNode（true）
+    对于普通对象，要想复制 使用  Object.assign（） 方法
+
+        var dst = {
+            title:'对象自身内容',
+        }
+        var src = {
+            name : '要复制的内容',
+        }
+        //对象复制
+        Object.assign(dst,src);  // 把src中的内容复制给了 dst（注意dst中原有内容还保留，不是覆盖掉）
+
+
+    （6）对象中的属性和值   Object.keys(obj)   Object.values(obj)
+    var obj = {
+        name : 'sha',
+        sex : '男'
+    }
+
+    Object.keys(obj);   // 返回的是一个数组，数组中的元素是对象的 属性名
+    Object.values(obj)  //返回的是以个数组，数组中的元素是对象的  属性值
+
+
+
+    总结：   Object.create（对象.prototype，【】）
+            Object.defineProperty(obj,'属性名'，{描述})
+            Object.defineProperties(obj,{})
+            Object.preventExtensions(对象名)
+            Object.seal(对象名)        object.isSealed(对象名)
+            Object.freeze(对象名)      object.isFrozen(对象名)
+            Object.assign(dstObj,srcObj)
+            Object.values(obj)
+            Object.keys(obj)
+
+
+
+
+
+
+
+
+    //回顾  原型对象中的方法  ， 注意 不是Object的了
+
+    1、 constructor 属性    查看实例对象所属的类
+
+    var  obj = new Object();
+    obj.name = 'sha';
+    obj.constructor;  // 返回值是  Object  ， 因为obj是根据 Object 类创建出来的，这里的constructor属性
+//                        其实是obj继承的原型对象 Object中的属性，并不是它本身的属性
+
+    2、 hasOwnProperty()  方法，检测对象是否有非继承的某个属性（也就是检测他自身的属性（包括方法，因为方法在类中
+                                也是体现为类的属性，只不过这个属性的值是一个方法罢了））
+    var  obj = new Object();
+    obj.name = 'sha';
+    obj.hasOwnProperty('name');  //返回true
+
+    3、 toString（） 和valueOf（）  方法，这两个方法都是继承自原型对象Object中的，当然也可自行设置
+    toString（） 是在对象被当做 字符串使用时自动调用的
+    valueOf（） 是在对象被当做数值 用于计算时使用的， （注意如果在本类中自己设置了valueOf和toString方法
+                                    valueOf的使用优先级好像是高于toString的，所以对于+也是先执行valueOf）
+
+
+
+
+
+</script>
+
+
+</body>
+</html>

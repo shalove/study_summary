@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    在jQuery中，设置匿名函数的时候，在匿名函数中的this一般指的是 JS dom对象，而不是JQdom对象！！！
+    <div style="border:1px solid red;width:100px;">asa s</div>
+    <script>
+        $(function () {
+            $("div").click(function () {
+                console.log(this);      //<div style="border:1px solid red;width:100px;">
+            });                         //不是{}对象集合形式的 JQ对象
+        })
+
+    1、 jquery 选择器
+        （1）基本选择器            与css中类似，可以根据 id/标签名/类名  来获取到元素
+         id选择器   $("#id")
+         标签选择器   $("div")
+          类名选择器  $(".className")
+
+
+        (2)层次选择器        与css类似
+            后代选择器       $("div span")  查找div 里的所有span标签
+            子元素选择器      $("div>span")  查找div的子元素span（注意span的子元素属于div的孙子元素了，不是子元素）
+            相邻元素选择器     $("div+span") 查找与div相邻并在div之后的span元素
+            并列选择器        $("div,span")  查找div 和span 标签， 注意并列选择 是以逗号分隔的
+
+        (3)过滤选择器
+        $("ul li:first")   查找ul下所有li中的第一个li
+        $("ul li:last")    查找ul下所有li中的最后一个li
+        $("ul li:eq(n)")   查找ul下所有li中的第 n 个li
+        $("ul li:even")    查找ul下所有li中的下标为偶数的li   （注意下标是从0开始计数的）
+        $("ul li:odd")    查找ul下所有li中的下标为奇数的li   （注意下标是从0开始计数的）
+        $("ul li:not('.className')")    查找ul下所有li中的类名不为 className 的li元素， 注意双引号与单引号的包裹问题
+        $("ul li:contains('txt')") 查找ul下所有li中  含有txt内容的li元素，如果txt不写，就会查出所有li
+        $("ul li:empty")   查找内容为空的 li元素
+
+    （5）链式操作
+    $("ul li").first() 查找ul下所有li中的第一个li
+    $("ul li").last() 查找ul下所有li中的最后一个li
+    $("ul li").eq(n) 查找ul下所有li中的第 n 个li
+    $("ul li").not('.className')  查找ul下所有li中的类名不为 className 的li元素
+                这里not中的内容不要再加 $来查找，会报错，直接使用 :first/ :last/.className等形式
+    $("ul li").contains('txt') 查找ul下所有li中  含有txt内容的li元素，如果txt不写，就会查出所有li
+    $("ul").find('li') 查找ul 后代中所有的 li子元素
+    $("ul li").hasClass('className') 判断 ul的 li中是否有类名为className 的li元素
+
+    链式操作与过滤选择器很多都类似，只是放到外面了加括号调用了，不像原来放在里面用 冒号：调用；
+    但是注意 even  、 odd和empty没有链式的操作
+
+
+
+    （4）属性选择器   $("ele[name ^= 'value']")    单引号建议加上
+    ele[name]   查找所有ele元素中含有name属性的元素
+    ele[name = 'value']  查找所有ele元素中含有name属性的元素并且name属性值等于 value的元素
+    ele[name ^= 'value']  查找所有ele元素中含有name属性的元素并且name属性值以value开头的元素
+    ele[name $= 'value']  查找所有ele元素中含有name属性的元素并且name属性值以value结尾的元素
+    ele[name *= 'value']  查找所有ele元素中含有name属性的元素并且name属性值含有value值的元素
+    ele[name != 'value']  查找所有ele元素中含有name属性的元素并且name属性值不等于value值的元素
+    ele[条件1][条件2]   查找所有ele元素中满足条件1和条件2的元素（类似并列选择器）
+
+
+
+        2、JS dom  和 JQ dom 互换
+          JQdom  转化为 JSdom
+            var jsdom = jqdom[0]    或    var jsdom = jqdom.get(0);
+
+            JSdom 转化为  JQdom
+            var jqdom =  $(jsdom）;
+
+
+    3、表单域过滤
+    单选、复选、下拉框
+
+    获取所有单选框             获取所有的复选框
+    $("input:radio");         $("input:checkbox")
+
+    获取单选、复选框的选中项        获取下拉列表的选中项
+    $("input:checked")          $("select option:selected")
+
+ 其实获取单选框、复选框、下拉框、选中项也好，都是跟普通获取标签元素是一样的，都可以用id、类名、标签来找到
+对应的选框，只不过可以用过滤选择 radio、checkbox（没有select过滤，select的获取貌似只有通过普通的标签、id、类名来获取）
+对于选中项也是一样，可以现获取到对应的选框，再用 checked（过滤单选和复选框的）；selected（过滤下拉表的），获取到对应的
+选中项，获取到的选中项返回的是  “jQuery 对象”
+
+
+4/ jQuery 中的click事件写法
+    $("#all").click(function () {
+
+    })
+
+    JS中
+    btn.onclick = function(){}
+
+
+
+5、 jQuery 中dom节点属性
+
+    5-1 在jQuery中使用  attr（）方法来操作节点的属性
+
+    （1）获取节点属性 （注意如果获取的dom对象是个集合，那么只会返回 第一个元素的属性！！！！！）
+    <input type="text" id="name" class="name" value="sha">
+        $dom.attr("属性名")               $("#name").attr("value")  //  sha
+
+    (2)设置节点属性
+        $dom.attr("属性名","要设置的值")     $("#name").attr("value","wang") //wang
+         设置多个属性值
+        $dom.attr({"属性名1":"要设置的值1","属性名2":"要设置的值2"...})
+
+      （3）使用匿名函数形式设置 属性值
+        $dom.attr("属性名",function(index,value){});
+        这里匿名函数需要传进两个形参，index是属性对象中属性对应的下标value是属性对象中属性对应的值
+        匿名函数的返回值，就是属性要设置的值
+
+    5-2  val()  方法
+        attr（）方法也是可以获取到元素中的value属性值的，他可以获取所有属性，不止value属性
+        而val（）方法是专门用来获取元素的value值的方法
+
+        $dom.val()  读取dom元素的value值， 对于多个元素，只读取第一个元素的value值
+        $dom.val("属性值") 设置dom元素的value属性值，全部元素都设置
+        $dom.val(["值1","值2"]..);同时设置多个值，（可以为复选框设置或多选下拉框设置选中的value值）
+        $dom.val(function(index,value){})  使用匿名函数设置值
+
+
+    6、  $dom.html()   和  $dom.text()
+
+        $dom.html()  读取元素内容包含html部分，类似JS中 innerHTML， 会连标签一起返回
+        <p><span>我爱你</span></p>
+        $("p").html()   //    返回 <span>我爱你</span>
+
+        $dom.text()  只读取文本部分，不包括html， 类似JS中 innerText
+        $("p").text()   // 返回  我爱你
+
+
+         $dom.html(“值”)  写入内容
+         $dom.html(function(index,value){})   //这里的index指值在对象中的索引，value是整个内容（<span>我爱你</span>）
+
+
+    7、css方法
+        $dom.css("样式")  读取样式
+        $dom.css("样式","值")  设置单个样式
+        $dom.css({"样式1":"值1","样式2":"值2"..})  设置多个样式
+        $dom.css("样式"，function(index,value){})  用匿名函数设置样式值
+
+
+    8、绑定类（添加类名）
+        $dom.addClass(“类名”)  添加类
+        $dom.addClass(function(){})  添加类,用函数形式
+        $dom.removeClass(“类名”) 删除类
+        $dom.removeClass(function(){}) 删除类，用函数形式
+
+    9、  遍历数组、对象     each（）
+        在JS中 遍历数组一般用for循环（其实for in也可以）；遍历对象用for in；
+        而jquery中遍历数组和对象都用  each（）方法
+
+        $.each(arr/obj,function(index,value){})
+        $(选择器).each(function (index,value) {})     function体内的this表示当前DOM对象
+
+
+    10、DOM节点操作
+        添加节点
+        $parentNode.append($node)
+        $node.appendTo($parentNode)
+        $node.prependTo($parentNode)
+        $node.after()
+        $node.before()
+        $mode.remove()
+
+        节点替换
+        $new.replaceAll($old)
+        $node1.replaceWith($node2)
+
+        删除节点
+        $parentNode.empty();
+        $node.remove()
+
+        克隆节点
+        $node.clone(true)
+        $node.clone(false)
+
+
+
+
+
+
+
+</body>
+</html>

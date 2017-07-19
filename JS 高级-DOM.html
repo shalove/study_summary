@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    1、document 是DOM模型的顶级对象，他用来基于HTML文档的操作
+        ---向文档中写入内容
+        ---查询页面中的节点
+        ---创建dom节点
+
+    2、 document.write（） 向HTML页面中写入内容；会有两种情况：
+        页面加载时写入会追加在后面，页面加载后写入会覆盖之前的内容
+
+    3、  0级dom（遗留dom）
+        document.body   获取body元素的dom对象
+        document.forms  获取所有表单元素的对象  返回一个集合
+
+        document.images
+        document.anchors
+        document.links
+        document.all
+
+        document.forms 在获取表单的时候，如果表单设置了name属性，那么也可以根据 document.forms.name来获取到对应的
+        表单
+        <form action="" name="f1"></form>
+        console.log(document.forms.f1);       //获取到的就是f1表单
+
+        经过命名的表单也被视为document的属性，所以可以直接用document.属性的方式获取
+
+        console.log(document.f1);            //获取到的就是f1表单
+
+
+
+    4、标准DOM查询节点 (查询到的结果都是对象，只不过多元素的会放到一个集合里)
+        document.getElementById（）             返回的是单独元素的DOM对象
+        document.getElementsByTagName（）       返回的是对象集合
+        document.getElementsByName（）          返回的是对象集合
+        document.getElementsByClassName（）      返回的是对象集合
+
+
+    5、创建节点
+        document.createElement（）   创建元素节点
+        document.createTextNode（）  创建文本节点
+        document.createAttribute（） 创建属性节点
+
+    6    操作顺序：  dom对象创建 元素节点/文本节点/属性节点（也可以通过节点的 setAttribute创建）
+                    节点方法有：  1、节点插入  parentNode.appendChild（节点名）
+                                            parentNode.insertBefore（插入的节点名，被插入之前的节点名）
+                                2、节点删除  parentNode.removeChild（要删除的节点名）
+                                3、节点克隆   node.cloneNode()  eg:  hr.cloneNode()
+                                            node.coloneNode（true） 深度克隆，除了节点本身，内容也复制
+                            可以看出节点的插入、删除都是需要通过操作其父节点的方法来实现的，克隆因为需要克隆的是本体节点
+                            所以使用者是被克隆的元素的dom对象
+
+
+    7  节点的属性
+        （1）通用属性      node.nodeName 节点名      名称返回的就是对应标签名的大写
+                    node.nodeType 节点类型    根据分为元素节点（1）、属性节点、文本节点（3）、注释节点，对应返回不同的数值，
+                               在node对象中可以使用常量代替数值，  Node.ELEMENT_NODE  Node.TEXT_NODE
+
+                     node.nodeValue 节点的值   元素节点返回 null  ，文本节点 返回文本值
+                    (对于文本节点，获取值还可以使用   node.data)
+
+        （2）标准属性   html标签中的标准属性都作为 DOM对象的标准属性
+    eg： <input type="text"  name="int" uid="123">
+        这里type  name  都是标准属性，而 uid 则是非标准属性（uid不是html中的标准属性）
+
+
+        （3）控件属性
+        ele.offsetLeft   元素控件左上角 距坐标0点的 x坐标
+        ele.offsetTop
+        ele.offsetWidth
+        ele.offsetHeight
+        ele.scrollLeft
+        ele.scrollTop
+
+        控件属性可以用来判断 控件元素在页面中的位置（注意一般先设置 position位置属性），
+
+       （4） 属性的修改
+        JS中对于HTML标准属性可以直接用dom属性来读取，  而对于非标准属性则需要使用  node.getAttribute()来获取
+        node.setAttribute()
+        node.gettAttribute()
+        node.removeAttribute()
+        node.hasAttribute()
+
+    8 节点也有自己的查询接口，可以用来查询当前节点下的子节点
+        node.getElementsByTagName()
+        node.getElementsByClassName()
+        注意和document对象不同，document 可以用 id/TagName/ClassName/Name  查询，这里只剩下TagName/ClassName
+
+    <ul>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+
+    var ul = document.getElementsByTagName('ul')[0];
+    这里 li 就是ul 节点下的子节点，一共有三个
+
+    lis = ul.getElementsByTagName('li');  //获得的是 li dom对象的集合（有三个 li 对象元素）
+    注意 ul的子节点有 7个， 空文本节点-- 第一个li节点--空文本节点--第二个li节点--空文本节点--第三个li节点--空文本节点
+
+
+    9.节点关系
+
+    node.parentNode;         node的父节点
+    node.childNodes;        node的所有子节点
+    node.firstChild；        node的第一个子节点
+    node.lastChild；         node的最后一个子节点
+    node.nextSibling        node的下一个兄弟节点
+    node.previousSibling    ndoe的前一个兄弟节点
+
+
+
+
+
+</body>
+</html>
+

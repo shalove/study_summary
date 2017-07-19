@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+
+//    1、JS运行原理  ---   window 全局对象
+
+    //JS代码在运行时首先会创建一个全局执行环境，就是定义一个全局对象（就是window这个顶级对象），定义在页面中的所有变量、函数
+    //都是 window 对象的属性,注意必须是定义在全局中的变量和函数才是window对象的属性，
+    // 比如例子中 woaini（属性） 和 shazinian（函数）是window的属性，但是 嵌套函数里的 heihei（变量）和wangjiadi(函数)就不是，
+    // 就算是在嵌套函数里去掉了 var 定义，变成全局变量，他也还不是（这里的love2），这里 love1  才是window 的属性；
+
+   var woaini=3;
+   love1=2;
+  function shazinian() {
+       love2=2;
+       function wangjiadi() {
+           var heihei=1;
+       }
+    }
+   console.log(window);
+
+
+<!--//  2、正因为 在全局执行环境里的 变量和函数都是 window 对象的 属性，所以即使在不同的script 代码段里，后面的可以使用前面的-->
+        <!--下面两个script代码段 第一个代码段定义了a ，第二个定义了b ， 在b所在区域就可以使用 a变量，即使在不同的script区域-->
+<script>
+    var a = 1;
+    console.log(a);
+    console.log(b);
+</script>
+<script>
+    var b =2;
+    console.log(a);
+    console.log(b);
+//                         <!--输出结果：-->
+//   <!--JS 高级总结.html:32            1    Uncaught ReferenceError: b is not defined-->
+//   <!--JS 高级总结.html:38            1    2-->
+</script>
+
+
+3、JS  要  读取代码---》编译--->运行   三个阶段
+    在编译阶段发生错误的话，会直接报错，所有代码都不会执行（类比java中，编译失败不能运行），
+    编译 没问题后，在运行阶段如果发生错误， 错误之前的代码可以正常运行（有输出的会正常输出），错误之后的代码不会再执行（后面有输出的
+    话也就不会输出了）；
+
+    编译阶段完成的工作是 ---》变量的声明 和 函数的定义 ，不能完成赋值等运算操作，那些需要上下文联系才能完成（运行阶段）；
+
+
+4、 注意函数的预加载
+    函数在编译阶段已经定义完成了，而函数执行是在 运行阶段， 所以在代码体现中 不管是在函数定义之后调用函数
+    还是在函数定义之前调用函数（不建议） 都是可以执行的；
+
+    <script>
+        ff(); //在声明之前调用函数，可以运行--但不建议
+
+     function ff(){console.log（‘哈哈’）}   //函数定义
+
+        ff(); //在声明之后调用函数，可以运行--建议使用
+    </script>
+
+
+5、JS中错误处理 ----    同样可以使用 try catch 语法；js中的错误是一个 Error 对象；PHP中是一个异常对象 exception
+
+
+6、JS中的变量和作用域
+    JS中变量的作用域分法和PHP中相同，   函数体外--》 全局变量； 函数体内--》局部变量
+    但是JS中  全局变量在局部作用域中也是可以使用的， 但是php中 全局变量和局部变量的作用域是 绝对分开的，互不干涉，互不使用
+
+7、为什么js中局部变量无法在函数外被访问？
+        因为js中函数一旦运行完毕，函数体内的变量就会被删除，恢复使用前状态，所以在外部就无法在被访问了
+
+8、变量如果在声明的时候不使用 var  关键字定义，那么他就是 全局变量，这样在函数外也是可以被访问到的。
+
+9/   声明的变量如果不赋值，那么它就会被默认 初始化值   undefined；
+
+
+10、  函数体内变量没有块状作用域， 指的是 变量在函数体内一经定义 在整个函数体内都能访问到
+
+自己理解： 因为JS会进行预编译，在预编译阶段就已经将变量进行了声明（初始化为 undefined），只是这时候还没有赋值（赋值是在运行时进行的）
+，所以不管变量时声明在调用前还是调用后都是可以访问到的，只是如果是在赋值前就调用，变量的值是 undefined；
+
+
+11、 作用域链
+    函数的定义作用域 ：         外围函数的激活对象--》上级外围函数激活对象。。。-》 window 对象；
+    函数的执行作用域 是在他的定义作用域前 加上一个激活对象；
+                        当前函数的激活对象-》  外围函数的激活对象--》上级外围函数激活对象。。。-》 window 对象；
+    函数体内的局部变量、形参、嵌套的函数  都是激活对象的 属性 (类似 全局变量 是 window 对象的属性一样)
+
+函数运行时的作用域是它的定义作用域 而不是 执行作用域；所以即使函数从 函数体内导出到 全局中执行，它的作用域还是 他原来在函数体内
+的定义作用域，不管他当前所处位置。
+
+            var x = 1;
+            function f1()
+            {
+                var x = 2;
+                function f2 ()
+                {
+                    console.log(x);
+                }
+                return f2;
+            }
+
+            var fff = f1();
+                fff();  // 输出  2
+
+//此时输出的是f2的外围函数f1中的 x 值；因为f2函数虽然被导出到全局中来执行了，但是它的定义作用域
+是外围函数 f1的激活对象 --》 window对象；所以他在输出x的时候，会先找到 f2 中的x = 2 ，直接输出；
+而不是在全局中 找到 x = 1 输出
+
+12 、  嵌套函数导出后，它的定义作用域是怎么起作用的？
+    JS中函数一旦定义，那么它的定义作用域也就固化了；定义时会将函数的定义作用域保存起来，成为函数内部状态的一部分；
+所以他即使被导出到函数体外执行，仍然能找到它的定义作用域。
+    当导出后被调用时，就会将函数的作用域设为它的定义作用域，并创建一个该函数的激活对象，添加到作用域链头部；
+此时函数体内的 局部变量、嵌套函数、形参 都是该激活对象的属性。
+
+
+13、 闭包的形成原理
+                            var x = 1;
+                            function f1()
+                            {
+                                var x = 2;
+                                 function f2 ()
+                                {
+                                  console.log(x);
+                                 }
+                                 return f2;
+                            }
+                            var fff = f1();
+                            fff();
+
+这里， f1 函数中嵌套了 f2 函数，f2函数中输出的 x  其实是  f1 中的变量 x； 本来如果在 f1 函数中调用f2，外围函数f1执行完
+之后，f1 的激活对象就会删除，
+但是由于在全局区将f1函数赋值给了变量 fff ，就相当于把 f1函数的返回值赋给了 fff；也就是变量fff现在存储的是 f2函数；
+紧接着进行了fff函数的调用，就相当于调用了f2函数；也就是说f2函数被导出到了全局区中调用；
+本来f1函数在赋值给fff函数之后，他的执行就结束了，那么相应的f1的激活对象就该被删除了，f1中的x也不应该在下面被获取到，
+但是由于f2是f1的嵌套函数， 它被导出了，那么f1的激活对象在f1函数执行结束后，不会被删除，而是会保存下来，所以其中的 x 的值也
+就保存下来了。这种代码和作用域的综合体 成为闭包。
+
+14、能够形成闭包的情况：
+    （1） 将嵌套函数作为返回值
+    （2）嵌套函数作为外部对象的属性
+
+     (1)   用闭包 原理  实现变量值递增
+        var fun = (function ()
+        {
+        var num = 0;
+        return function f1()
+        {
+        console.log(++num);
+        }
+        }())
+        fun();
+        fun();
+        fun();
+                                       (2) //将嵌套函数 作为 外部对象的属性
+                                        var obj = new Object();
+                                        function accessor(obj,name) {
+                                                var data;
+                                             obj["set"+ name] = function (val){
+                                                                              data = val;
+                                                                         }
+                                              obj["get"+name] = function(){
+                                                                             return data;
+                                                                            }
+                                        }
+                                        accessor(obj,"age");
+                                        obj.setage(18);
+                                        console.log(obj.getage());
+
+第二种嵌套函数 作为 外部对象的属性；  这里 obj是一个外部对象，写了一个访问器函数accessor用于设置
+对象的属性，它的第一个参数是一个对象，对象的传参是 引用传递，所以这里在函数内部给对象添加属性的时候，就等于给
+函数外的被引用的对象添加了属性（满足第二种形成闭包的条件），这里setname添加属性的函数又属于accessor的嵌套函数，这就形成了闭包，
+所以data的值能够被保存，所以在后面再调用getname函数的时候才能获取到 data的值
+
+
+
+15、JS中的数据类型
+    JS中有数据类型分为两种大类 ：  基本数据类型 和 复合数据类型（引用数据类型）
+    基本数据类型： 数值型、字符串型、布尔型、null、undefined
+    引用数据类型： 数组、函数、对象
+
+基本数据类型占据内存小，引用数据类型（数组啊、函数啊、对象啊）一般占据空间较大，如果不用引用传递，那么对于 a=b 这种；
+每赋值一次就会新开辟空间存储，这样会很占内存，所以采用传址方式，避免产生多余对象啥的。
+
+16、 基本数据封装对象
+var str = “ni hao ma”；
+console。log（str）；
+这里str 明明是一个字符串变量，却有这length属性； 其实是因为 JS中当把一个基本数据类型当做对象那样使用的时候
+会隐式的创建它的封装对象，然后调用相应的方法 返回结果 用完即销毁
+
+
+
+
+17  JS创建对象的两种方式
+    （1）  var obj = {
+        name : "sha",           //直接量    在对象中直接赋值属性和方法，有点类似于php关联数组，只是不用=》而是冒号：；
+        sex : '男',
+        age : 18,
+        show : function(){ console.log('哈哈')}
+}
+
+    (2) var obj =new Object;
+            obj.name = "sha";       //先创建 对象，再给对象添加属性、方法
+            obj.sex = "男";
+            obj.age = "18";
+            obj.show = function(){console.log('哈哈')}
+
+
+18    对象的转化
+
+对象是复合类型的数据 它不仅有值 更有结构 因此一般不直接使用、当把一个对象用于字符串环境中时，
+JS会隐式的调用它的toString方法 获取对象的字符串形式值 然后运算。当把一个对象用于数学环境中时 ，
+JS会隐式的调用它的valueOf方法 获取对象的数字形式值 然后运算。通常对象有自带的toString和valueOf 你也可以自定义该方法
+
+
+19  数组创建
+(1-1)  先创建空数组，再填值
+var arr = [];
+    arr[0] = 'name';
+    arr[1] = 'age';
+    arr[2] = 'sex';
+(1-2)   创建的时候直接赋值
+var arr = ['name','age','sex'];
+
+（2-1）先创建空数组，再填值
+var arr = new Array();
+    arr[0] = 'name';
+    arr[1] = 'age';
+    arr[2] = 'sex';
+
+(2-2)var arr = new Array('name','age','sex'); 创建的时候直接赋值
+
+JS中数组也是对象类型，而且数组算是只有索引数组，没有PHP中关联数组形式，如果说硬要添加一个数组进去原数组，当成关联数组来看
+其实 此时新添加的数组就不再算数组的元素了，而是当成原数组对象的一个属性，数组遍历和计算数组长度都不会算进这个属性
+
+对象可以用 obj[‘name’] 和 obj.name 形式来调用属性，但是obj.name 的name不能是变量（不能解析），但中括号中可以是变量
+
+
+20  数组遍历
+    for循环遍历即可，注意如果数组的下标不连续，漏掉的下标的值就是undefined；
+
+21  运算符和表达式
+（1） typeof  运算符（不是函数）     用于查看变量的数据类型，返回值是string类型，返回变量所属类型
+
+    typeof（1）       //  ‘number’
+    typeof true     // 'boolean'
+    ...
+
+
+（2）delete  用于删除 对象中的属性、数组中的元素 、 未用var 定义的变量
+
+（3）instanceof  用于检测一个对象是否是某个类的实例
+
+arr = [] ;
+   cosole.log(arr instanceof Array);   //true
+   cosole.log(arr instanceof Object);   //true   JS中数组也是对象
+
+（4）in 判断对象中是否有某个属性
+    var obj = {name:'sha'}
+    console.log('name' in obj);   // true    name得加引号，不然是变量了
+
+(5) with 语句
+变量有作用域 当作用域比较长的时候 可以使用with修改作用域链的头 简化代码输入量
+
+(6) for(var p in o) 语句
+for/in用来查看对象的属性（包括方法）
+var obj = {
+    name:'sha',
+    age:18,
+    ff:function(){}
+}
+for(var p in obj){
+    console.log(p);
+}
+
+(7)    || 运算
+
+
+
+
+
+22   JS 中的函数
+
+    1、 声明函数             //函数声明中 必不可少的是  function （）{}      其他的函数名、函数体；return都是可以省略的
+    function 函数名（）
+    {
+        函数体；
+        return；
+    }
+
+    2、js中的函数是一个数据类型和普通的数据类型一样，可以赋值给变量、对象的属性、作为数组的元素、函数的参数
+
+    赋给变量：    var  ff  = function （）{}
+    赋给对象的属性    var obj = {
+                                'name' : 'sha',
+                                'show': function (){}
+
+                                }
+
+
+    3  函数体内的this 指代
+        当函数作为普通的函数使用，它的this永远指代window对象，
+        而当 函数作为 对象的方法时，它的this指代当前调用的对象
+
+    4、函数参数
+    js中的函数参数，形参和实参不需要严格匹配；当实参个数大于形参个数时，会在形参匹配完成后，舍弃剩余的实参
+    当实参个数小于形参时，缺少的形参的值会默认为 undefined；
+
+    5、 函数体内的  arguments 对象
+        arguments 对象只存在于函数体内（因为它是用来接收实参的，只在函数体内有意义），他是一个类似于数组的对象，
+        对象中存储的是函数调用时传入的所有实参，使用arguments可以代替形参来接收实参的值，对于传入的实参个数不固定时，
+        使用arguments来接收实参
+
+        arguments 中两个属性  ：   arguments.length 表示传入的实参个数
+                                arguments.callee 表示传入的当前使用的函数
+
+
+        函数的length属性表示函数所需传入的形参的个数 ，  arguments的length属性表示传入的实参个数
+
+    6、  prototype属性
+    函数的prototype用来获取一个构造函数的原型对象，原型对象是用来继承的，JS中原生的继承 就是通过原型对象和原型链实现
+
+    7、 call和apply方法
+        函数对象的call和apply方法 可以修改一个函数体内this的指向，通过修改this的指向 可以给一个对象添加方法
+        eg：
+        A.m.apply(B, [1,2])或者A.m.call(B,1,2);
+        apply 和call 作用是一样的，只是apply 传参是把参数都放到一个数组中传入，call是一个一个传
+
+
+
+
+    关于JS中的静态变量和静态方法 与 PHP中的静态变量和静态方法的思考
+    PHP---
+            class Animal{
+                public $leg = 4;        // 对象的属性 （实例属性）
+                public static mouse = 1;    //类的静态属性
+                public function run(){}     //对象的方法 （实例方法）
+                public static function cry(){}  //类的静态方法
+
+}
+
+JS中--        function Animal(){
+                    this.leg = 4;   //对象的属性（实例属性）
+                    this.run =function(){}      //对象的方法（实例方法）
+}
+            Animal.mouse = 1;   //类的属性（静态属性）
+            Animal.cry = function(){}     //类的方法（静态方法）
+
+    其实这两种还是可以理解为统一的，可以看到不管是PHP还是JS，都有两种类型的属性和方法，一种是属于实例化对象的
+    属性和方法（实例属性、实例方法），一种是属于类的属性和方法（静态属性和静态方法）
+
+    只不过在PHP中实例属性、实例方法和静态属性、静态方法都是定义在类中的；
+    而PS中因为类是 类与构造函数的统一体，它其中只定义了实例属性、实例方法（一般定义到原型对象中）；
+    所属与类的属性和方法（静态属性和静态方法），是通过单独的类作为对象，通过定义其属性和方法来定义
+    静态属性和静态方法。
+
+总结：不管在PHP还是JS，属于对象的属性和方法是实例属性和实例方法，属于类的属性和方法是静态属性和静态方法
+，静态属性和静态方法只能直接由类来调用，他不随对象的改变而改变
+
+JS中的类比较特殊， 他是类和构造函数的统一体，同时他又是一个函数，也就是一个对象（函数也是对象），所以他可以有
+对象属性（也就是静态属性），和对象方法（也就是静态方法）
+
+
+
+
+JS中的继承
+常用：js中的集成也类似与PHP，继承父类的属性和方法，同时扩展自己的属性和方法
+继承父类的属性可以用，在子类的类中调用父类的call方法，改变this指向，让子类中含有父类的属性，
+对于父类方法的继承，可以使用Object.create（父类.prototype）的方法让子类的原型对象基于父类的原型对象创建
+这样子类就继承了父类的方法，同时还可以继续扩展子类的原型对象的方法
+
+            父类 Human
+            function Human(name,sex,age){
+                this.name = name;   //父类属性
+                this.sex = sex;     //父类属性
+                this.age = age;     //父类属性
+            }
+            Human.prototype.run = function(){
+            console.log("父类跑");     //父类原型对象中的方法
+            }
+
+            子类 Student
+            function Student(name,sex,age,cid){
+                Human.call(this,name,sex,age);  //调用call方法改变this指向，让子类属性继承父类
+                this.cid = cid; //子类自己的扩展属性
+            }
+            //使用Object.create（）方法，让子类的原型对象继承父类的方法
+            Student.prototype = Object.create(Human.prototype);
+            Student.prototype.show = function(){    //扩展子类的原型对象中的方法
+            console.log("子类方法");
+            }
+
+            var stu = new Student("sha","男","12","88");    //实例化子类的对象
+            console.log(stu);
+            stu.run();
+            stu.show();
+
+
+
+
+</body>
+</html>
+
+
